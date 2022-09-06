@@ -1,3 +1,9 @@
 # yamdb_final
-yamdb_final
-CI/CD setup
+Настройка CI/CD процессов дл я проекта api_yamdb.
+
+Статус репозитария:
+[](https://github.com/26remph/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
+
+
+### Описание
+В качестве решения для CI/CD выбран github action
