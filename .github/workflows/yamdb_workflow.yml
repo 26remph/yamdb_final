@@ -49,7 +49,7 @@ jobs:
         #cd yamdb_final/
         # запустить написанные разработчиком тесты
         pytest
-        cd api_yamdb/
+        # cd api_yamdb/
 
   # Сразу после них добавьте новую задачу: деплой приложения
   build_and_push_to_docker_hub:
@@ -74,7 +74,7 @@ jobs:
           uses: docker/build-push-action@v2
           with:
             push: true
-            tags: 26remph/api_yamdb:latest
+            tags: 26remph/yamdb_final:latest
 
   deploy:
       runs-on: ubuntu-latest
