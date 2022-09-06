@@ -11,4 +11,7 @@
 
 #### Технологии  
 - CI(continue integration)/CD(continue development)
+- docker
+- docke-compose
+- yaml configuration file
 
