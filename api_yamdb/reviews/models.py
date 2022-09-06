@@ -9,11 +9,11 @@ SLICE_REVIEW = 30
 
 
 class User(AbstractUser):
+    """Кастомная модель пользователя.
+
+    Доп.поля: Био, Роль, Код подтверждения. Методы: is_moderator, is_admin.
     """
-    Кастомная модель пользователя.
-    Доп.поля: Био, Роль, Код подтверждения.
-    Методы: is_moderator, is_admin
-    """
+
     USER = 'user'
     MODERATOR = 'moderator'
     ADMIN = 'admin'
@@ -41,24 +41,30 @@ class User(AbstractUser):
     )
 
     class Meta:
+        """Manual configure model."""
+
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
         ordering = ('username',)
 
     @property
     def is_moderator(self):
+        """Проверка роли пользователя."""
         return self.role == User.MODERATOR
 
     @property
     def is_admin(self):
+        """Проверка роли пользователя."""
         return self.role == User.ADMIN or self.is_superuser
 
     def __str__(self):
+        """Представление объекта."""
         return str(self.username)
 
 
 class Category(models.Model):
-    """Модель для работы с категориями произведений"""
+    """Модель для работы с категориями произведений."""
+
     name = models.CharField(
         max_length=256,
         verbose_name='Название категории'
@@ -70,14 +76,18 @@ class Category(models.Model):
     )
 
     class Meta:
+        """Manual configure model."""
+
         ordering = ('slug',)
 
     def __str__(self):
+        """Представление объекта."""
         return self.slug
 
 
 class Genre(models.Model):
-    """Модель для работы с жанрами произведений"""
+    """Модель для работы с жанрами произведений."""
+
     name = models.CharField(
         max_length=256,
         verbose_name='Название жанра'
@@ -89,14 +99,18 @@ class Genre(models.Model):
     )
 
     class Meta:
+        """Manual configure model."""
+
         ordering = ('slug',)
 
     def __str__(self):
+        """Представление объекта."""
         return self.slug
 
 
 class Title(models.Model):
-    """Модель для работы с произведениями"""
+    """Модель для работы с произведениями."""
+
     name = models.CharField(
         max_length=256,
         verbose_name='Название произведения',
@@ -114,17 +128,21 @@ class Title(models.Model):
     )
 
     class Meta:
+        """Manual configure model."""
+
         ordering = ('name',)
 
     def __str__(self):
+        """Представление объекта."""
         return self.name[:SLICE_REVIEW]
 
 
 class GenreTitle(models.Model):
+    """Вспомогательна модель для модели Titles, поля genre.
+
+    Служит для реализации отношения many-to-many fields.
     """
-    Вспомогательна модель для модели Titles, поля genre.
-    Служит для реализации отношения many-to-many fields
-    """
+
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -138,14 +156,17 @@ class GenreTitle(models.Model):
     )
 
     class Meta:
+        """Manual configure model."""
+
         ordering = ('genre',)
 
     def __str__(self):
+        """Представление объекта."""
         return f'{self.title} {self.genre}'
 
 
 class Review(models.Model):
-    """Модель для работы с отзывами на произведения"""
+    """Модель для работы с отзывами на произведениями."""
 
     score = models.PositiveSmallIntegerField(
         default=None,
@@ -178,6 +199,8 @@ class Review(models.Model):
     )
 
     class Meta:
+        """Manual configure model."""
+
         ordering = ('-pub_date',)
         verbose_name = 'Отзыв',
         verbose_name_plural = 'Отзывы'
@@ -193,11 +216,13 @@ class Review(models.Model):
         ]
 
     def __str__(self):
+        """Представление объекта."""
         return self.text[:SLICE_REVIEW]
 
 
 class Comment(models.Model):
-    """Модель для работы с комментариями на отзывы"""
+    """Модель для работы с комментариями на отзывы."""
+
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
@@ -217,8 +242,11 @@ class Comment(models.Model):
     )
 
     class Meta:
+        """Manual configure model."""
+
         ordering = ('-pub_date',)
         verbose_name = 'Комментарий'
 
     def __str__(self):
+        """Представление объекта."""
         return self.text[:SLICE_REVIEW]

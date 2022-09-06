@@ -6,6 +6,8 @@ from .models import Category, Comment, Genre, GenreTitle, Review, Title, User
 
 
 class UserAdmin(admin.ModelAdmin):
+    """Настройки модели администратора."""
+
     list_display = ('username', 'email', 'role', )
     list_editable = ('role', )
     search_fields = ('username', 'role', )

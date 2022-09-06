@@ -22,7 +22,8 @@ from .serializers import (CategorySerializer, CommentSerializer,
 
 
 class CategoryViewSet(CreateListDeleteMixinSet):
-    """Вью сет для работы с категориями произведений"""
+    """Вью сет для работы с категориями произведений."""
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (AdminOrReadonly, )
@@ -32,7 +33,8 @@ class CategoryViewSet(CreateListDeleteMixinSet):
 
 
 class GenreViewSet(CreateListDeleteMixinSet):
-    """Вью сет для работы с жанрами произведений"""
+    """Вью сет для работы с жанрами произведений."""
+
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (AdminOrReadonly, )
@@ -42,7 +44,8 @@ class GenreViewSet(CreateListDeleteMixinSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    """Вью сет для работы с произведениями"""
+    """Вью сет для работы с произведениями."""
+
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend, )
@@ -52,31 +55,37 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     """Вью сет для работы с комментариями к произведениям."""
+
     serializer_class = CommentSerializer
     permission_classes = (AuthorModeratorAdminOrReadOnly, )
 
     def get_queryset(self):
+        """Построение выборки данных."""
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, pk=review_id)
         return review.comments.all()
 
     def perform_create(self, serializer):
+        """Вносит изменения перед созданием объекта."""
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, pk=review_id)
         serializer.save(review=review, author=self.request.user)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    """Вью сет для работы с отзывами на произведения"""
+    """Вью сет для работы с отзывами на произведения."""
+
     serializer_class = ReviewSerializer
     permission_classes = (AuthorModeratorAdminOrReadOnly, )
 
     def get_queryset(self):
+        """Построение выборки данных."""
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
         return title.reviews.all()
 
     def perform_create(self, serializer):
+        """Вносит изменения перед созданием объекта."""
         title_id = self.kwargs.get('title_id')
         if self.request.user.reviews.filter(title=title_id).exists():
             raise ValidationError("Only one reviews in titles, sorry.")
@@ -86,7 +95,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """Вьюсет для модели User"""
+    """Вьюсет для модели User."""
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (AdminOnlyPermission, )
@@ -100,6 +110,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def me(self, request):
         """
         Функция редактирования профайла.
+
         Показывает учетные данные авторизованного пользователя.
         Дает возможность их отредактировать.
         """
@@ -122,10 +133,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class UserCreateAPIView(APIView):
-    """
-    Класс для создания нового пользователя
-    """
+    """Класс для создания нового пользователя."""
+
     def post(self, request, *args, **kwargs):
+        """POST метод."""
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
             if not User.objects.filter(
@@ -152,10 +163,10 @@ class UserCreateAPIView(APIView):
 
 
 class ConfirmationAPIView(APIView):
-    """
-    Класс для получения токена по коду подтверждения `confirmation_code`.
-    """
+    """Класс для получения токена по коду подтверждения `confirmation_code`."""
+
     def post(self, request, *args, **kwargs):
+        """POST метод."""
         serializer = ConfirmationSerializer(data=request.data)
         if serializer.is_valid():
             user = User.objects.get(
