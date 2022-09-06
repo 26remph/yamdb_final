@@ -1,5 +1,5 @@
 """
-Модуль initdata используется для загрузки первоначальных данных моделей
+Модуль initdata используется для загрузки первоначальных данных моделей.
 
     Основное применение - запускается из командной строки как
     managment команда.
@@ -116,11 +116,9 @@ def get_model(model_name):
         return None
 
     try:
-        model = getattr(mod, model_name)
+        return getattr(mod, model_name)
     except AttributeError:
         return None
-
-    return model
 
 
 def get_model_csv_filename(name):
@@ -174,7 +172,7 @@ def create_kwargs(headers, row):
 
 
 class Command(BaseCommand):
-    """Класс для работы с кастомными менеджмент коммандами"""
+    """Класс для работы с кастомными менеджмент коммандами."""
     help = 'Loads initial data for models'
 
     def add_arguments(self, parser):

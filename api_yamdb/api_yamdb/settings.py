@@ -1,3 +1,5 @@
+"""Main configure service file."""
+
 import os
 from datetime import timedelta
 

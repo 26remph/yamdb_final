@@ -1,3 +1,5 @@
+"""Serialization module."""
+
 import datetime as dt
 
 from django.db.models import Avg
@@ -10,12 +12,15 @@ from reviews.models import (Category, Comment, Genre, GenreTitle, Review,
 
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор для упаковки комментариев."""
+
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username'
     )
 
     class Meta:
+        """Manual configure."""
+
         model = Comment
         fields = '__all__'
         read_only_fields = ('review', )
@@ -23,39 +28,49 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор для упаковки отзывов."""
+
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username'
     )
 
     class Meta:
+        """Manual configure."""
+
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    """Сериализатор для упаковки категории"""
+    """Сериализатор для упаковки категории."""
 
     class Meta:
+        """Manual configure."""
+
         fields = ('name', 'slug')
         model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    """Сериализатор для упаковки жанров"""
+    """Сериализатор для упаковки жанров."""
 
     class Meta:
+        """Manual configure."""
+
         fields = ('name', 'slug')
         model = Genre
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    """Сериализатор для упаковки произведений"""
+    """Сериализатор для упаковки произведений."""
+
     genre = GenreSerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
     rating = serializers.SerializerMethodField()
 
     class Meta:
+        """Manual configure."""
+
         fields = (
             'id', 'name', 'year', 'rating',
             'description', 'genre', 'category',
@@ -63,7 +78,7 @@ class TitleSerializer(serializers.ModelSerializer):
         model = Title
 
     def get_rating(self, obj):
-        """Получаем среднюю оценку произведения по оценкам пользователей"""
+        """Получаем среднюю оценку произведения по оценкам пользователей."""
         rating = Review.objects.filter(
             title=obj.id
         ).aggregate(Avg('score'))['score__avg']
@@ -72,15 +87,17 @@ class TitleSerializer(serializers.ModelSerializer):
         return None
 
     def validate_year(self, value):
-        """Валидация года выпуска произведения, сравнивая с текущим годом"""
+        """Валидация года выпуска произведения, сравнивая с текущим годом."""
         now = dt.date.today().year
         if value >= now:
             raise serializers.ValidationError('Произведение еще не вышло')
         return value
 
     def validate(self, data):
-        """Получаем первоначальные данные, переданные в поле `genre`
-        и поле `category`, проводим их валидацию.
+        """Получаем первоначальные данные.
+
+        Данные переданные в поле `genre` и поле `category`,
+        проводим их валидацию.
         """
         init_genre = self.initial_data.getlist('genre')
         if init_genre:
@@ -115,6 +132,7 @@ class TitleSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
+        """Переопределенный метод create."""
         genres = validated_data.pop('genre')
         title, status = Title.objects.get_or_create(**validated_data)
         genre = Genre.objects.filter(slug__in=genres)
@@ -123,7 +141,7 @@ class TitleSerializer(serializers.ModelSerializer):
         return title
 
     def update(self, instance, validated_data):
-
+        """Переопределенный метод update."""
         if validated_data.get('genre'):
             genres = validated_data.pop('genre')
             genre = Genre.objects.filter(slug__in=genres)
@@ -137,16 +155,18 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class GenreTitles(serializers.ModelSerializer):
+    """Сериализатор для упаковки жанров."""
 
     class Meta:
+        """Manual configure."""
+
         fields = ('title', 'genre')
         model = GenreTitle
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для работы с моделью User
-    """
+    """Сериализатор для работы с моделью User."""
+
     username = serializers.RegexField(
         r'^[\w.@+-]+\Z',
         max_length=150,
@@ -170,6 +190,8 @@ class UserSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
+        """Manual configure."""
+
         model = User
         fields = (
             'username',
@@ -183,9 +205,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для создания пользователя
-    """
+    """Сериализатор для создания пользователя."""
+
     username = serializers.RegexField(
         r'^[\w.@+-]+\Z',
         max_length=150,
@@ -197,6 +218,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
+        """Manual configure."""
+
         model = User
         fields = (
             'username',
@@ -209,6 +232,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def validate_username(username):
+        """Валидация юзера me."""
         if username.lower() == 'me':
             raise serializers.ValidationError(
                 {'username':
@@ -219,9 +243,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         """
         Валидация username и email.
+
         Если email и username совпадают, то все ок, делаем запрос на себя
-        и получаем токен.
-        Если совпадает только что-то одно, то выводим ошибку с инфой.
+        и получаем токен. Если совпадает только что-то одно, то выводим
+        ошибку с инфой.
         """
         if User.objects.filter(username=attrs['username'],
                                email=attrs['email']).exists():
@@ -254,13 +279,14 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class ConfirmationSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для проверки конфирмейшн кода и выдачи токенов
-    """
+    """Сериализатор для проверки конфирмейшн кода и выдачи токенов."""
+
     username = serializers.CharField(max_length=150, required=True)
     confirmation_code = serializers.CharField(required=True)
 
     class Meta:
+        """Manual configure."""
+
         model = User
         fields = (
             'username',
@@ -268,6 +294,7 @@ class ConfirmationSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, attrs):
+        """Валидация кода подтверждения."""
         user = get_object_or_404(User, username=attrs['username'])
         if not user.confirmation_code == attrs['confirmation_code']:
             raise serializers.ValidationError(

@@ -1,3 +1,5 @@
+"""Apps configure module."""
+
 from django.apps import AppConfig
 
 

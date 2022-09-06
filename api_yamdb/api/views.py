@@ -1,3 +1,5 @@
+"""View module class base build."""
+
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
